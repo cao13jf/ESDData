@@ -64,10 +64,9 @@ def parse_anno_file(cvat_xml, image_name):
         anno.append(image)
     return anno
 
-def create_mask_file(mask, polygon, scale_factor, label):
+def create_mask_file(mask, polygon, label):
     points = [tuple(map(float, p.split(','))) for p in polygon.split(';')]
     points = np.array([(int(p[0]), int(p[1])) for p in points])
-    points = points*scale_factor
     points = points.astype(int)
     # mask = cv2.drawContours(mask, [points], -1, color=(255, 255, 255), thickness=5)
     height, width = mask.shape

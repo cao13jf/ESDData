@@ -19,6 +19,7 @@ def parse_args():
             '--image-dir', metavar='DIRECTORY', required=True,
             help='directory with input images'
         )
+
     parser.add_argument(
             '--cvat-xml', metavar='FILE', required=True,
             help='input file with CVAT annotation in xml format'
@@ -26,10 +27,6 @@ def parse_args():
     parser.add_argument(
             '--output-dir', metavar='DIRECTORY', required=True,
             help='directory for output masks'
-        )
-    parser.add_argument(
-            '--scale-factor', type=float, default=1.0,
-            help='choose scale factor for images'
         )
 
     return parser.parse_args()
@@ -48,7 +45,6 @@ def main():
             for shape in anno[0]["shapes"]:
                 mask = create_mask_file(mask,
                                         shape["points"],
-                                        args.scale_factor,
                                         label=label2num[shape["label"]])
         save_indexed_png(output_path, mask)
 

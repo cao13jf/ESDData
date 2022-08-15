@@ -75,3 +75,19 @@ def create_mask_file(mask, polygon, label):
     mask[mask_array[..., -1] != 0] = label
 
     return mask
+
+
+def find_clips(frame_idxs):
+    clip_durations = []  # [[start1, end1], ...]
+    gaps = [right - left for left, right in zip(frame_idxs[:-1], frame_idxs[1:])]
+
+    duration = [frame_idxs[0]]
+    for idx, gap in enumerate(gaps):
+        if gap > 1:
+            duration.append(frame_idxs[idx])
+            clip_durations.append(duration[1] - duration[0])
+            duration = [frame_idxs[idx + 1]]
+    duration.append(frame_idxs[-1])
+    clip_durations.append(duration[1] - duration[0])
+
+    return clip_durations

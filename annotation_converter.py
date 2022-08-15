@@ -1,12 +1,10 @@
-# refer to https://towardsdatascience.com/extract-annotations-from-cvat-xml-file-into-mask-files-in-python-bb69749c4dc9
-
 import os
 import cv2
 import argparse
 import numpy as np
 from tqdm import tqdm
 
-from utils.utils import dir_create, parse_anno_file, create_mask_file, save_indexed_png
+from utils.tools import dir_create, parse_anno_file, create_mask_file, save_indexed_png
 
 label2num = {"a": 1, "b": 2, "c": 3}  # TODO: Change label dicationary
 

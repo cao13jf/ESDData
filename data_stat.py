@@ -41,19 +41,21 @@ for idx, label_file in enumerate(label_files):
             phase_clips = find_clips(frame_idxs)
             # phase_clips = [x / len(phase_label) for x in phase_clips]
         clip_cunts[phase] = len(phase_clips)
+        clip_cunts["{} frame".format(phase)] = sum(phase_clips)
     clip_cunts["total"] = len(phase_label["Phase"].tolist())
     all_clips[case_name] = clip_cunts
 
-data_dict = {"Rank": [], "Name": [], "Injection": [], "Dissection": [], "Injection ratio": [], "Dissection ratio": [], "Total frame": []}
+data_dict = {"Rank": [], "Name": [], "Injection": [], "Dissection": [], "Injection frame": [], "Dissection frame":[], "Injection ratio": [], "Dissection ratio": []}
 rank = 1
 for k, v in all_clips.items():
     data_dict["Rank"].append(rank)
     data_dict["Name"].append(k)
     data_dict["Injection"].append(v["injection"])
     data_dict["Dissection"].append(v["dissection"])
-    data_dict["Injection ratio"].append(v["injection"] / v["total"])
-    data_dict["Dissection ratio"].append(v["dissection"] / v["total"])
-    data_dict["Total frame"].append(v["total"])
+    data_dict["Injection frame"].append(v["injection frame"])
+    data_dict["Injection ratio"].append(v["injection"] / v["injection frame"])
+    data_dict["Dissection frame"].append(v["dissection frame"])
+    data_dict["Dissection ratio"].append(v["dissection"] / v["dissection frame"])
     rank += 1
 
 data_pd = pd.DataFrame.from_dict(data_dict)

@@ -5,7 +5,7 @@ from matplotlib.pyplot import figure
 from matplotlib import pyplot as plt
 from PIL import Image
 
-from utils.tools import generate_phase_band, get_durations, plot_pie, generate_transition
+from utils.tools import generate_phase_band, get_durations, plot_pie, generate_transition, get_score_A, get_score_B
 
 # overlaid_img = np.array(Image.open("test.png"))
 # im = plt.imread("background.png")
@@ -29,22 +29,25 @@ from utils.tools import generate_phase_band, get_durations, plot_pie, generate_t
 # Import background template
 
 # Plot phase bars
-labels = [1] * 400 + [2] * 400 + [3] * 400 + [4] * 400
-phase_file = "./reports/case_time_phase.png"
+case_name = "tem"
+labels = [1] * 100 + [2] * 200 + [3] * 300 + [4] * 400
+status = [5] * 100 + [6] * 200 + [7] * 300 + [7] * 400
+trainee = [8] * 100 + [9] * 200 + [10] * 300 + [10] * 400
+
+
+if not os.path.isdir("./reports/components"):
+    os.makedirs("./reports/components")
+
+phase_file = "./reports/components/{}_time_phase.png".format(case_name)
+status_file = "./reports/components/{}_time_status.png".format(case_name)
+trainee_file = "./reports/components/{}_time_trainee.png".format(case_name)
+pie_file = "./reports/components/{}_phase_pie.png".format(case_name)
+transition_file = "./reports/components/{}_transition.png".format(case_name)
+
 generate_phase_band(labels, file_name=phase_file)
-
-status = [5] * 400 + [6] * 400 + [7] * 400 + [7] * 400
-status_file = "./reports/case_time_status.png"
 generate_phase_band(status, file_name=status_file)
-
-trainee = [8] * 400 + [9] * 400 + [10] * 400 + [10] * 400
-trainee_file = "./reports/case_time_trainee.png"
 generate_phase_band(trainee, file_name=trainee_file)
-
-pie_file = "./reports/phase_pie.png"
 plot_pie(labels, pie_name=pie_file)
-
-transition_file = "./reports/transition.png"
 generate_transition(labels, transition_file)
 
 
@@ -68,7 +71,6 @@ plt.imshow(status, extent=[281, 5718, 6667, 6889])
 trainee = Image.open(trainee_file)
 plt.imshow(trainee, extent=[281, 5718, 6143, 6362])
 
-
 # Add durations
 counts = get_durations(labels)
 locations = [[1416, 5401], [1416, 5166], [1416, 4926], [1416, 4686], [1416, 4440]]
@@ -89,13 +91,16 @@ plt.imshow(pie_duration, extent=[3570, 4740, 4398, 5568])
 
 # add transition
 transition = Image.open(transition_file)
-plt.imshow(transition, extent=[3730, 5447, 2091, 3566])
+plt.imshow(transition, extent=[3730, 5447, 2060, 3566])
 
 # Add scores
-score_A =
+score_A = get_score_A(labels)
+plt.text(2460, 400, "{:2.2f}".format(score_A), fontsize=4)  # add text
+# score_B = get_score_B()
 
+score_B = get_score_B(labels)
+plt.text(4268, 400, "{:2.2f}".format(score_B), fontsize=4)  # add text
 
 plt.axis("off")
 # plt.show()
-case_name = os.path.basename(phase_file).split(".")[0] + "_report"
-plt.savefig("./reports/{}.png".format(case_name), bbox_inches='tight', dpi=800, pad_inches=0.0)
+plt.savefig("./reports/{}_report.png".format(case_name), bbox_inches='tight', dpi=800, pad_inches=0.0)

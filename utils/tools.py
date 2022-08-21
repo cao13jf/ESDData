@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from lxml import etree
 import numpy as np
 from PIL import Image
+import math
 
 P = [252, 233, 79, 114, 159, 207, 239, 41, 41, 173, 127, 168, 138, 226, 52,
      233, 185, 110, 252, 175, 62, 211, 215, 207, 196, 160, 0, 32, 74, 135, 164, 0, 0,
@@ -372,7 +373,7 @@ def get_durations(labels):
 from sklearn import metrics
 def generate_transition(labels, file_name):
     phase_dict_key = [2, 3, 4, 1]
-    confusion = metrics.confusion_matrix(labels[:-1], labels[1:], labels=phase_dict_key, normalize="true")
+    confusion = metrics.confusion_matrix(labels[:-1], labels[1:], labels=phase_dict_key)  #, normalize="true")
     # phase_dict_key = ['idle', 'marking', 'injection', 'cir cutting', 'sub dissection']
     fig, ax = plt.subplots()
     im, cbar = heatmap(confusion, phase_dict_key, phase_dict_key, ax)
@@ -392,3 +393,18 @@ def generate_transition(labels, file_name):
     plt.clf()
 
 def get_score_A(labels):
+    injection_proporation = labels.count(2) / len(labels)
+    dissection_proporation = labels.count(3) / len(labels)
+
+    score_A = -2.516 * 10 ** (-5) * (injection_proporation / dissection_proporation) + 0.1945
+
+    return score_A
+
+
+def get_score_B(labels):
+    frame_idxs = [i for i, x in enumerate(labels) if x == 3]
+    clips = find_clips(frame_idxs)
+
+    ratio = len(clips) / sum(clips)
+
+    return 0.0009609 * math.exp(-0.0001791 * ratio)

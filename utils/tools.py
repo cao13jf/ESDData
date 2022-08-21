@@ -207,3 +207,188 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
             texts.append(text)
 
     return texts
+
+
+# Referred to https://stackoverflow.com/questions/59638155/how-to-set-0-to-white-at-a-uneven-color-ramp
+def generate_phase_band(labels, file_name="tem.png"):
+
+    len_labels = len(labels)
+    x, y = np.meshgrid(np.linspace(0, len_labels, len_labels+1), np.linspace(0, 1, 2))
+    z_gt = np.array([labels])
+
+    label_width = 0.005 * len_labels
+    fig1, ax1 = plt.subplots()
+
+    img = ax1.pcolormesh(x, y, z_gt, cmap="tab20")
+    img.set_clim(1, 20)
+    ax1.margins(x=0)
+    ax1.margins(y=0)
+    plt.axis("off")
+    plt.gcf().set_size_inches(label_width, 2)
+    plt.savefig(file_name, bbox_inches='tight', pad_inches=0.0)
+    plt.clf()
+    plt.close()
+
+
+def heatmap(data, row_labels, col_labels, ax=None,
+            cbar_kw={}, cbarlabel="", **kwargs):
+    """
+    Create a heatmap from a numpy array and two lists of labels.
+
+    Parameters
+    ----------
+    data
+        A 2D numpy array of shape (M, N).
+    row_labels
+        A list or array of length M with the labels for the rows.
+    col_labels
+        A list or array of length N with the labels for the columns.
+    ax
+        A `matplotlib.axes.Axes` instance to which the heatmap is plotted.  If
+        not provided, use current axes or create a new one.  Optional.
+    cbar_kw
+        A dictionary with arguments to `matplotlib.Figure.colorbar`.  Optional.
+    cbarlabel
+        The label for the colorbar.  Optional.
+    **kwargs
+        All other arguments are forwarded to `imshow`.
+    """
+
+    if not ax:
+        ax = plt.gca()
+
+    # Plot the heatmap
+    im = ax.imshow(data, **kwargs)
+
+    # Create colorbar
+    cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw)
+    cbar.ax.set_ylabel(cbarlabel, rotation=-90, va="bottom")
+
+    # Show all ticks and label them with the respective list entries.
+    ax.set_xticks(np.arange(data.shape[1]))
+    ax.set_xticklabels(col_labels)
+    ax.set_yticks(np.arange(data.shape[0]))
+    ax.set_yticklabels(row_labels)
+
+    # Let the horizontal axes labeling appear on top.
+    ax.tick_params(top=True, bottom=False,
+                   labeltop=True, labelbottom=False)
+
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=-30, ha="right", rotation_mode="anchor")
+
+    # Turn spines off and create white grid.
+    # ax.spines[:].set_visible(False)
+
+    ax.set_xticks(np.arange(data.shape[1]+1)-.5, minor=True)
+    ax.set_yticks(np.arange(data.shape[0]+1)-.5, minor=True)
+    ax.grid(which="minor", color="w", linestyle='-', linewidth=3)
+    ax.tick_params(which="minor", bottom=False, left=False)
+
+    return im, cbar
+
+def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
+                     textcolors=("black", "white"),
+                     threshold=None, **textkw):
+    """
+    A function to annotate a heatmap.
+
+    Parameters
+    ----------
+    im
+        The AxesImage to be labeled.
+    data
+        Data used to annotate.  If None, the image's data is used.  Optional.
+    valfmt
+        The format of the annotations inside the heatmap.  This should either
+        use the string format method, e.g. "$ {x:.2f}", or be a
+        `matplotlib.ticker.Formatter`.  Optional.
+    textcolors
+        A pair of colors.  The first is used for values below a threshold,
+        the second for those above.  Optional.
+    threshold
+        Value in data units according to which the colors from textcolors are
+        applied.  If None (the default) uses the middle of the colormap as
+        separation.  Optional.
+    **kwargs
+        All other arguments are forwarded to each call to `text` used to create
+        the text labels.
+    """
+
+    if not isinstance(data, (list, np.ndarray)):
+        data = im.get_array()
+
+    # Normalize the threshold to the images color range.
+    if threshold is not None:
+        threshold = im.norm(threshold)
+    else:
+        threshold = im.norm(data.max())/2.
+
+    # Set default alignment to center, but allow it to be
+    # overwritten by textkw.
+    kw = dict(horizontalalignment="center", verticalalignment="center")
+    kw.update(textkw)
+
+    # Get the formatter in case a string is supplied
+    if isinstance(valfmt, str):
+        valfmt = matplotlib.ticker.StrMethodFormatter(valfmt)
+
+    # Loop over the data and create a `Text` for each "pixel".
+    # Change the text's color depending on the data.
+    texts = []
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
+            text = im.axes.text(j, i, valfmt(data[i, j], None), **kw)
+            texts.append(text)
+
+    return texts
+
+def plot_pie(labels, pie_name):
+    # fig1, ax1 = plt.subplots()
+    label_list = [2, 3, 4, 1]
+    counts = []
+    for label in label_list:
+        counts.append(labels.count(label))
+
+    fig1, ax1 = plt.subplots()
+    img = ax1.pie(counts)
+    ax1.margins(x=0)
+    ax1.margins(y=0)
+    plt.axis("off")
+    plt.savefig(pie_name, bbox_inches='tight', pad_inches=0.0)
+    plt.clf()
+    plt.close()
+
+def get_durations(labels):
+    label_list = [2, 3, 4, 1]
+    counts = []
+    for label in label_list:
+        counts.append(labels.count(label))
+    counts.append(len(labels))
+
+    return counts
+
+from sklearn import metrics
+def generate_transition(labels, file_name):
+    phase_dict_key = [2, 3, 4, 1]
+    confusion = metrics.confusion_matrix(labels[:-1], labels[1:], labels=phase_dict_key, normalize="true")
+    # phase_dict_key = ['idle', 'marking', 'injection', 'cir cutting', 'sub dissection']
+    fig, ax = plt.subplots()
+    im, cbar = heatmap(confusion, phase_dict_key, phase_dict_key, ax)
+    cbar.remove()
+    frame1 = plt.gca()
+    texts = annotate_heatmap(im, valfmt="{x:.2f}")
+    frame1.axes.get_xaxis().set_visible(False)
+    frame1.axes.get_yaxis().set_visible(False)
+    frame1.axes.margins(x=0)
+    frame1.axes.margins(y=0)
+
+    # fig.tight_layout()
+    # plt.ylabel("Annotation")
+    # pstr = "Prediction {}; acc {:>10.4f}".format(base_name.split("_")[0], acc)
+    # plt.xlabel("Prediction")
+    plt.savefig(file_name, bbox_inches='tight', pad_inches=0.0)
+    plt.clf()
+
+def get_score_A(labels):

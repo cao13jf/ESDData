@@ -129,7 +129,7 @@ for clip in year_clips:
 # for injection_clip, dissection_clip in zip(injection_year_clips, dissection_year_clips):
 #     injection_clip_sum = len(injection_clip)
 #     norm_inejction_clip = [x / injection_clip_sum for x in injection_clip]
-#     dissection_clip_sum = len(dissection_clip)
+    #     dissection_clip_sum = len(dissection_clip)
 #     norm_dissection_clip = [x / dissection_clip_sum for x in dissection_clip]
 #     norm_clips.append([x / y for x, y in zip(norm_inejction_clip, norm_dissection_clip)])
 

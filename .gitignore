@@ -2,3 +2,6 @@
 .idea
 **/__pycache__
 .DS_Store
+stats
+phase_all_merge
+

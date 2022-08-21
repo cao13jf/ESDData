@@ -97,22 +97,49 @@ from sklearn import metrics
 # pd_data.to_csv("./tem.csv", index=False)
 
 
-# plot points of all infos
-import matplotlib.pyplot as plt
-plt.style.use(["science", "no-latex"])
+# # plot points of all infos
+# import matplotlib.pyplot as plt
+# plt.style.use(["science", "no-latex"])
+#
+#
+# pd_data = pd.read_csv("./stat_info.csv", header=0)
+# dates = pd_data["Days"].tolist()
+# for name in pd_data:
+#     data = pd_data[name].tolist()
+#     if isinstance(data[0], (int, float)):
+#         print("Plotting {}".format(name))
+#         plt.scatter(dates, data, s=5, alpha=0.8, marker="1", c="red")
+#         plt.title(name)
+#         plt.savefig("./stats/{}.pdf".format(name))
+#         plt.clf()
+#         plt.close()
+
+# # Get correlation matrix
+# import matplotlib.pyplot as plt
+# plt.style.use(["science", "no-latex"])
+# pd_data = pd.read_csv("./stat_info.csv", header=0)
+# corr = pd_data.corr(method="pearson")
+# corr = corr.applymap(lambda x: abs(x))
+# corr = corr.fillna(0)
+# corr = corr.style.background_gradient(cmap='Reds')
+# corr.to_excel("./corr.xlsx", index=True)
+# # display(corr)
 
 
-pd_data = pd.read_csv("./stat_info.csv", header=0)
-dates = pd_data["Days"].tolist()
-for name in pd_data:
-    data = pd_data[name].tolist()
-    if isinstance(data[0], (int, float)):
-        print("Plotting {}".format(name))
-        plt.scatter(dates, data)
-        plt.title(name)
-        plt.savefig("./stats/{}.pdf".format(name))
-        plt.clf()
-        plt.close()
+# Overlay two images
+
+#!/usr/bin/env python
+from pylab import *
+from PIL import Image
 
 
+datafile = "./test.png"
+h = Image.open(datafile)
+
+ax = axes([0,0,1,1], frameon=False)
+ax.set_axis_off()
+ax.set_xlim(0,2)
+ax.set_ylim(0,2)
+im = imshow(h, origin="upper", extent=[0, 2, 0, 2])  # axes zoom in on portion of image
+im2 = imshow(h, origin='upper',extent=[0,1,0,1]) # image is a small inset on axes
 

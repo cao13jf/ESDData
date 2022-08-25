@@ -70,9 +70,9 @@ def extract_frames(args):
         one_target_clip = whole_video.subclip(t_start=all_duration[0], t_end=all_duration[1])
         target_clips.append(one_target_clip)
     target_video = editor.concatenate_videoclips(target_clips)
-    save_file = os.path.join(save_dir, os.path.basename(video_dir) + ".MP4")
-    target_video.write_videofile(save_file, audio=False, codec='mpeg4')
-    print("Saving video to {}".format(save_file))
+    # save_file = os.path.join(save_dir, os.path.basename(video_dir) + ".MP4")
+    # target_video.write_videofile(save_file, audio=False, codec='mpeg4')
+    # print("Saving video to {}".format(save_file))
 
     # # save downsample image
     target_video.write_images_sequence(nameformat=os.path.join(save_dir, "frame-%05d.png"), fps=2)

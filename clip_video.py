@@ -46,12 +46,12 @@ def extract_frames(args):
     target_phase = args["target_phase"]
 
     print("Begin {}".format(video_dir))
-    save_dir = os.path.join(r"E:\ESD\ESD_Vessel_Frames", os.path.basename(video_dir) + "_clipped")
+    save_dir = os.path.join(r"D:\ProcessedData\Vessel_Frames", os.path.basename(video_dir) + "_clipped")
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
 
         # # Reading videos
-    video_files = sorted(glob(os.path.join(video_dir, "*.MP4")), key=lambda x: int(x.split("_")[-1].split(".")[0]))  # Collect all video files
+    video_files = sorted(glob(os.path.join(video_dir, "*")), key=lambda x: int(x.split("_")[-1].split(".")[0]))  # Collect all video files
     clips = []
     for video_file in video_files:
         clip = editor.VideoFileClip(video_file, audio=False)
@@ -82,11 +82,11 @@ if __name__ == "__main__":
 
     # label_files = ["/Users/jeff/Downloads/27_UH9685651.txt"]
     # video_dirs = ["/Users/jeff/Downloads/27_UH9685651_20150916"]  # "21_E1773023_20131128", "24_M1268525_20131217"
-    data_names = ["05_A16756254", "06_A16762105", "07_A16781837"]
-    label_files = [r"E:\ESD\ESD_data_all\phase\{}.txt".format(x) for x in data_names]
-    video_dirs = [r"E:\ESD\ESD_data_all\video\{}".format(x) for x in data_names]
+    data_names = ["32_A178_12_9_2017"]
+    label_files = [r"D:\ProjectData\ESDDataPhases\{}.txt".format(x) for x in data_names]
+    video_dirs = [r"D:\ProjectData\ESDDataVideos\{}".format(x) for x in data_names]
 
-    mpPool = mp.Pool(3)
+    # mpPool = mp.Pool(3)
     configs = []
     for label_file, video_dir in zip(label_files, video_dirs):
         config = {}
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         config['video_dir'] = video_dir
         config["target_phase"] = target_phase
         configs.append(config.copy())
-    #    extract_frames(config)
-    mpPool.map(extract_frames, configs)
-    mpPool.close()
-    mpPool.join()
+        extract_frames(config)
+    # mpPool.map(extract_frames, configs)
+    # mpPool.close()
+    # mpPool.join()

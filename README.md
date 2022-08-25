@@ -2,6 +2,7 @@
 Tools for converting *.xml in CVAT into mask.
 
 ### Usage example
+* Transform `.xml` annotation from CVAT into image masks
 ```shell
 python converter --image-dir /path/to/raw/images  --cvat-xml /path/to/annotations.xml --output-dir /path/to/output-mask
 ```

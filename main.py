@@ -93,19 +93,20 @@ if __name__ == "__main__":
 
     # label_files = ["/Users/jeff/Downloads/27_UH9685651.txt"]
     # video_dirs = ["/Users/jeff/Downloads/27_UH9685651_20150916"]  # "21_E1773023_20131128", "24_M1268525_20131217"
-    data_names = ["15_A97001983"]
-    label_files = [r"E:\ESD\ESD_data_all\phase\{}.txt".format(x) for x in data_names]
+    # data_names = ["15_A97001983"]
+    # label_files = [r"E:\ESD\ESD_data_all\phase\{}.txt".format(x) for x in data_names]
     video_dirs = [r"E:\ESD\ESD_data_all\video\{}".format(x) for x in data_names]
+    video_dirs = glob("")
 
-    # mpPool = mp.Pool(4)
+    mpPool = mp.Pool(10)
     configs = []
-    for label_file, video_dir in zip(label_files, video_dirs):
+    for video_dir in video_dirs:
         config = {}
         config['label_file'] = label_file
         config['video_dir'] = video_dir
         config["target_phase"] = target_phase
         configs.append(config.copy())
         extract_frames(config)
-    # mpPool.map(extract_frames, configs)
-    # mpPool.close()
-    # mpPool.join()
+    mpPool.map(extract_frames, configs)
+    mpPool.close()
+    mpPool.join()

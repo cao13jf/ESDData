@@ -130,7 +130,7 @@ if __name__ == "__main__":
         config["target_phase"] = target_phase
         config["crop_size"] = [175, 50, 690, 530] #crop_sizes[idx]
         configs.append(config.copy())
-        # extract_frames(config)
+        extract_frames(config)
     mpPool.map(extract_frames, configs)
     mpPool.close()
     mpPool.join()

@@ -36,11 +36,21 @@ def downsample2image(config):
 
 
 if __name__ == "__main__":
-    data_names = ["42_G316314"]
-    video_dir = r"D:\Download"
-    video_dirs = [os.path.join(video_dir, x) for x in data_names]
-    downsample2image(video_dirs[0])
-    mpPool = mp.Pool(len(data_names))
-    mpPool.map(downsample2image, video_dirs)
-    mpPool.close()
-    mpPool.join()
+    # data_names = ["42_G316314"]
+    # video_dir = r"D:\Download"
+    # video_dirs = [os.path.join(video_dir, x) for x in data_names]
+    # downsample2image(video_dirs[0])
+    # mpPool = mp.Pool(len(data_names))
+    # mpPool.map(downsample2image, video_dirs)
+    # mpPool.close()
+    # mpPool.join()
+
+    time_slots = [["11:23:00", "13:16:40"],
+                  ["13:24:40", "14:00:00"],
+                  ["14:05:00", "14:21:00"],
+                  ["14:24:00", "14:45:10"],
+                  ["14:56:00", "15:13:20"],
+                  ["15:15:10", "15:50:20"],
+                  ["15:53:20", "16:31:00"]]
+
+

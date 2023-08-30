@@ -519,7 +519,7 @@ import datetime
 #         video_idxs = [row["Selected"]]
 #     else:
 #         video_idxs = [int(s) for s in row["Selected"].split(",")]
-#     video_files = glob(os.path.join("/media/jeffery/MedData/ESD/NewData_2022_12_22", data_name, "**/**"), recursive=True)
+#     video_files = glob(os.path.join("/media/jeffery/MedData/ESD/NewData_2023_08_02", data_name, "**/**"), recursive=True)
 #     video_files = [video_file for video_file in video_files if os.path.isfile(video_file)]
 #     video_files = sorted(list(set(video_files)))
 #     video_files = [video_files[idx0] for idx0 in video_idxs]
@@ -543,7 +543,7 @@ import datetime
 #
 #
 # if __name__ == "__main__":
-#     log_file = "/home/jeffery/hpc/Dataset/ESD_new_data/20221222NewCases/log.xlsx"
+#     log_file = "/home/jeffery/hpc/Dataset/ESD_new_data/20230802NewCases/log_refine.xlsx"
 #     pd_log = pd.read_excel(log_file)
 #     pd_log = pd_log.fillna("")
 #     pd_log = pd_log[pd_log["Point1"] != ""]
@@ -575,33 +575,69 @@ import datetime
 # ================================
 # Sort out stastical information
 # ================================
+import multiprocessing as mp
 def find_info(pd_data, query_str, query_col):
     for _, check_row in pd_data.iterrows():
         if query_str in check_row["HKID"].lower():
             return check_row[query_col]
     return ""
 
+def find_dir(all_cases, target_str):
+    str_len = len(target_str)
+    for i in range(str_len):
+        found_dirs = []
+        for all_case in all_cases:
+            if target_str[:-1].lower() in all_case.lower():
+                found_dirs.append(all_case)
+        if len(found_dirs) == 1:
+            return found_dirs[0]
+        else:
+            return ""
+
+from moviepy.editor import VideoFileClip, concatenate_videoclips
+
+def combine_videos(config_dict):
+    save_dir = "/media/jeffery/MedData/ESD/NewData_2023_08_02_Processed/Combined"
+    save_flle = os.path.join(save_dir, config_dict["name"] + ".mp4")
+    case_files = config_dict["case_files"]
+
+    clips = []
+    for case_file in case_files:
+        try:
+            clip = VideoFileClip(case_file)
+            clips.append(clip)
+        except:
+            print("Filed at {}".format(case_file))
+    combined_clip = concatenate_videoclips(clips)
+    combined_clip.write_videofile(save_flle, audio=False, write_logfile=True, logger=None)
+    print("Finished {}".format(save_flle))
+
+if __name__ == "__main__":
+    raw_info = "/home/jeffery/hpc/Dataset/ESD_new_data/20230802NewCases/log.xlsx"
+    processed_info = "/home/jeffery/hpc/Dataset/ESD_new_data/20230802NewCases/log_refine.xlsx"
+    pd_raw_info = pd.read_excel(processed_info, header=0, index_col=None)
+    pd_raw_info = pd_raw_info.fillna("")
+
+    root_dir = "/media/jeffery/MedData/ESD/NewData_2023_08_02"
+    pd_raw_info = pd_raw_info[pd_raw_info["CASE FOLDER"] != ""]
+
+    configs = []
+    for idx, row in tqdm(pd_raw_info.iterrows(), total=len(pd_raw_info)):
+        config_dict = {}
+        case_dir = os.path.join(root_dir, row["CASE FOLDER"])
+        case_files = sorted(glob(os.path.join(case_dir, "**/**"), recursive=True))
+        case_files = [case_file for case_file in case_files if os.path.isfile(case_file)]
+        case_files = sorted(list(set(case_files)))
+
+        config_dict["case_files"] = case_files
+        config_dict["name"] = row["CASE FOLDER"]
+        configs.append(config_dict)
+        # combine_videos(config_dict)
+
+    mpPool = mp.Pool(mp.cpu_count() - 8)
+    for idx, _ in enumerate(tqdm(mpPool.imap_unordered(combine_videos, configs), total=len(configs), desc="Downsample videos")):
+        pass
 
 
-raw_info = "/home/jeffery/hpc/Dataset/ESD_new_data/20221222NewCases/Yip_ESD_Aug_2022.xlsx"
-processed_info = "/home/jeffery/hpc/Dataset/ESD_new_data/20221222NewCases/log.xlsx"
-pd_raw_info = pd.read_excel(raw_info)
-pd_processed = pd.read_excel(processed_info)
 
-pd_raw_info = pd_raw_info.fillna("")
-pd_raw_info = pd_raw_info[pd_raw_info["Name"] != ""]
 
-dates = []
-surgeons = []
-procedures = []
-
-for _, row in pd_processed.iterrows():
-    id = row["Name"][-4:].lower()
-    dates.append(find_info(pd_raw_info, id, "Date"))
-    surgeons.append(find_info(pd_raw_info, id, "D/B"))
-    procedures.append(find_info(pd_raw_info, id, "Procedure"))
-
-pd_processed.insert(1, "Date", dates)
-pd_processed.insert(2, "Surgeon", surgeons)
-pd_processed.insert(3, "Procedure", procedures)
-pd_processed.to_excel(processed_info.replace(".xlsx", "_refine.xlsx"), index=False)
